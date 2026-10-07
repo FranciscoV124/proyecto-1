@@ -2,6 +2,9 @@
 # Script principal: ejecuta la etapa 1 y la etapa 2
 
 import os, sys
+import parte_composicion
+import parte_hu
+import pygame 
 
 def main():
     print("PROYECTO #1 - INFO 1128 - By Alberto Caro")

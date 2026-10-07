@@ -1,0 +1,461 @@
+import cv2
+import numpy as np
+
+
+class AnalizadorFiguras:
+
+    def __init__(self, ruta_imagen):
+        self.ruta_imagen = ruta_imagen
+        self.imagen = None
+
+
+    def detectar_imagen(self):
+
+        self.imagen = cv2.imread(self.ruta_imagen)
+
+        if self.imagen is None:
+            print("Error al cargar la imagen")
+            return False
+
+        print("Imagen cargada correctamente")
+
+        return True
+
+    def detectar_rojo(self):
+
+        hsv = cv2.cvtColor(
+            self.imagen,
+            cv2.COLOR_BGR2HSV
+        )
+
+        rojo_bajo1 = np.array([0, 100, 100])
+        rojo_alto1 = np.array([10, 255, 255])
+
+        rojo_bajo2 = np.array([170, 100, 100])
+        rojo_alto2 = np.array([179, 255, 255])
+
+        mascara1 = cv2.inRange(
+            hsv,
+            rojo_bajo1,
+            rojo_alto1
+        )
+
+        mascara2 = cv2.inRange(
+            hsv,
+            rojo_bajo2,
+            rojo_alto2
+        )
+
+        mascara = cv2.bitwise_or(
+            mascara1,
+            mascara2
+        )
+
+        return mascara
+
+
+    def detectar_verde(self):
+
+        hsv = cv2.cvtColor(
+            self.imagen,
+            cv2.COLOR_BGR2HSV
+        )
+
+        verde_bajo = np.array([40, 100, 100])
+        verde_alto = np.array([85, 255, 255])
+
+        mascara = cv2.inRange(
+            hsv,
+            verde_bajo,
+            verde_alto
+        )
+
+        return mascara
+
+
+    def calcular_area(self, mascara):
+
+        area = cv2.countNonZero(mascara)
+
+        return area
+
+
+    def calcular_centroide(self, mascara):
+
+        y, x = np.where(mascara > 0)
+
+        if len(x) == 0:
+            print("No se detectaron pixeles")
+            return None
+
+        cx = np.mean(x)
+        cy = np.mean(y)
+
+        return cx, cy
+
+    def centroide_momentos(self, mascara):
+
+        momentos = cv2.moments(
+            mascara,
+            binaryImage=True
+        )
+
+        if momentos["m00"] == 0:
+            print("No se puede calcular el centroide")
+            return None
+
+        cx = momentos["m10"] / momentos["m00"]
+        cy = momentos["m01"] / momentos["m00"]
+
+        return cx, cy
+
+
+    def dibujar_centroide(self, cx, cy):
+
+        resultado = self.imagen.copy()
+
+        cx = int(cx)
+        cy = int(cy)
+
+        tam = 10
+
+        # Linea horizontal
+        cv2.line(
+            resultado,
+            (cx - tam, cy),
+            (cx + tam, cy),
+            (0, 0, 0),
+            2
+        )
+
+        # Linea vertical
+        cv2.line(
+            resultado,
+            (cx, cy - tam),
+            (cx, cy + tam),
+            (0, 0, 0),
+            2
+        )
+
+        return resultado
+
+
+
+    def momento_orden(self, mascara, p, q):
+
+        y, x = np.where(mascara > 0)
+
+        if len(x) == 0:
+            return None
+
+        x = x.astype(np.float64)
+        y = y.astype(np.float64)
+
+        momento = np.sum(
+            (x ** p) *
+            (y ** q)
+        )
+
+        return momento
+
+
+    def momento_central(self, mascara, p, q):
+
+        y, x = np.where(mascara > 0)
+
+        if len(x) == 0:
+            return None
+
+        x = x.astype(np.float64)
+        y = y.astype(np.float64)
+
+        cx = np.mean(x)
+        cy = np.mean(y)
+
+        mu = np.sum(
+            ((x - cx) ** p) *
+            ((y - cy) ** q)
+        )
+
+        return mu
+
+
+    def momento_normalizado(self, mascara, p, q):
+
+        y, x = np.where(mascara > 0)
+
+        if len(x) == 0:
+            return None
+
+        x = x.astype(np.float64)
+        y = y.astype(np.float64)
+
+        # Centroide
+        cx = np.mean(x)
+        cy = np.mean(y)
+
+        # Momento central
+        mu_pq = np.sum(
+            ((x - cx) ** p) *
+            ((y - cy) ** q)
+        )
+
+        # mu00 = area
+        mu00 = len(x)
+
+        # Exponente de normalizacion
+        gamma = 1 + ((p + q) / 2)
+
+        # Momento central normalizado
+        eta = mu_pq / (mu00 ** gamma)
+
+        return eta
+
+
+    def figura_a(self):
+
+        if not self.detectar_imagen():
+            return
+
+        mascara = self.detectar_rojo()
+
+
+        area = self.calcular_area(
+            mascara
+        )
+
+        centroide = self.calcular_centroide(
+            mascara
+        )
+
+        if centroide is None:
+            return
+
+        cx, cy = centroide
+
+
+        centroide_m = self.centroide_momentos(
+            mascara
+        )
+
+        if centroide_m is None:
+            return
+
+        cx_m, cy_m = centroide_m
+
+
+        print("\n==========================")
+        print("       FIGURA 1.a")
+        print("==========================")
+
+        print(
+            "\nArea:",
+            area,
+            "pixeles"
+        )
+
+        print(
+            "\nCentroide directo:"
+        )
+
+        print(
+            "Cx =",
+            cx
+        )
+
+        print(
+            "Cy =",
+            cy
+        )
+
+        print(
+            "\nCentroide mediante momentos:"
+        )
+
+        print(
+            "Cx =",
+            cx_m
+        )
+
+        print(
+            "Cy =",
+            cy_m
+        )
+
+        # Dibujar centroide
+        resultado = self.dibujar_centroide(
+            cx,
+            cy
+        )
+
+        # Mostrar
+        cv2.imshow(
+            "Imagen Original",
+            self.imagen
+        )
+
+        cv2.imshow(
+            "Mascara Roja",
+            mascara
+        )
+
+        cv2.imshow(
+            "Centroide Figura A",
+            resultado
+        )
+
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+
+
+    def figura_b(self):
+
+        if not self.detectar_imagen():
+            return
+
+        mascara = self.detectar_verde()
+
+        # Orden solicitado
+        p = 2
+        q = 3
+
+
+        m23 = self.momento_orden(
+            mascara,
+            p,
+            q
+        )
+
+   
+
+        mu23 = self.momento_central(
+            mascara,
+            p,
+            q
+        )
+
+        eta23 = self.momento_normalizado(
+            mascara,
+            p,
+            q
+        )
+
+
+        print("\n==========================")
+        print("       FIGURA 1.b")
+        print("==========================")
+
+        print(
+            "\nMomento de orden m23:"
+        )
+
+        print(
+            "m23 =",
+            m23
+        )
+
+        print(
+            "\nMomento central mu23:"
+        )
+
+        print(
+            "mu23 =",
+            mu23
+        )
+
+        print(
+            "\nMomento central normalizado eta23:"
+        )
+
+        print(
+            "eta23 =",
+            eta23
+        )
+
+        cv2.imshow(
+            "Figura B",
+            self.imagen
+        )
+
+        cv2.imshow(
+            "Mascara Verde",
+            mascara
+        )
+
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+
+    def figura_c(self):
+
+        print("\nFigura C todavia no implementada")
+        print("Aqui calcularemos H1, H2 y H3 de Hu")
+
+
+
+def main():
+
+    while True:
+
+        print("\n==============================")
+        print("      PROYECTO MOMENTOS")
+        print("==============================")
+
+        print("1. Figura 1.a")
+        print("2. Figura 1.b")
+        print("3. Figura 1.c")
+        print("0. Salir")
+
+        opcion = input(
+            "\nSeleccione una opcion: "
+        )
+
+
+        if opcion == "1":
+
+            analizador = AnalizadorFiguras(
+                "proyecto_2/imagenes/imagen1.jpg"
+            )
+
+            analizador.figura_a()
+
+
+
+        elif opcion == "2":
+
+            analizador = AnalizadorFiguras(
+                "proyecto_2/imagenes/imagen2.jpg"
+            )
+
+            analizador.figura_b()
+
+
+        elif opcion == "3":
+
+            analizador = AnalizadorFiguras(
+                "proyecto_2/imagenes/imagen3.jpg.png"
+            )
+
+            analizador.figura_c()
+
+
+
+
+        elif opcion == "0":
+
+            print("\nPrograma terminado.")
+            break
+
+
+        else:
+
+            print("\nOpcion invalida.")
+
+
+# ======================================================
+# INICIAR PROGRAMA
+# ======================================================
+
+if __name__ == "__main__":
+    main()
