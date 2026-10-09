@@ -1,0 +1,76 @@
+
+from PIL import Image
+import matplotlib.pyplot as plt
+import cv2
+
+imagen = cv2.imread("proyecto_2/imagenes/lolcito.png")
+
+
+def detectar_imagen(imagen):
+    if imagen is None:
+        print("Error al cargar la imagen")
+        return False
+
+    print("Imagen cargada correctamente")
+    return True
+
+
+def calcular_histograma(imagen):
+    imagen_gris = imagen.convert("L")
+
+    histograma = imagen_gris.histogram()
+
+    plt.figure(figsize=(8, 4))
+    plt.bar(range(256), histograma, color="gray")
+
+    plt.title("Histograma de la imagen en gris")
+    plt.xlabel("Intensidad de pixeles")
+    plt.ylabel("Cantidad de pixeles")
+    plt.show()
+
+    imagen_gris.show()
+
+    tonalidad_gris = histograma.index(max(histograma))
+
+    print("Tonalidad mas repetida en gris:", tonalidad_gris)
+
+
+def calcular_histograma_rgb(imagen):
+
+    rojo, verde, azul = imagen.split()
+
+    canales = [
+        ("Rojo", rojo, "red"),
+        ("Verde", verde, "green"),
+        ("Azul", azul, "blue")
+    ]
+
+    for nombre, canal, color in canales:
+
+        histograma = canal.histogram()
+
+        tonalidad = histograma.index(max(histograma))
+
+        print(f"Tonalidad mas repetida en {nombre}: {tonalidad}")
+        print(f"Cantidad de pixeles: {histograma[tonalidad]}")
+
+        plt.figure(figsize=(8, 4))
+
+        plt.bar(range(256), histograma, color=color)
+
+        plt.title(f"Histograma del canal {nombre}")
+        plt.xlabel("Intensidad de pixeles")
+        plt.ylabel("Cantidad de pixeles")
+
+        plt.show()
+
+
+if detectar_imagen(imagen):
+
+    imagen_pil = Image.open(
+        "proyecto_2/imagenes/lolcito.png"
+    ).convert("RGB")
+
+    calcular_histograma_rgb(imagen_pil)
+
+    calcular_histograma(imagen_pil)

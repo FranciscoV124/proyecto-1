@@ -1,0 +1,59 @@
+from PIL import Image
+import matplotlib.pyplot as plt
+from pathlib import Path
+import cv2
+
+imagen = cv2.imread("proyecto_2/imagenes/flores.jpg")
+
+def detectar_imagen(imagen):
+    if imagen is None:
+        print("Error al cargar la imagen")
+        return False
+
+    print("Imagen cargada correctamente")
+    return True
+
+detectar_imagen(imagen)
+
+def separar_colores(imagen):
+
+    rojo, verde, azul = imagen.split()
+
+    gris = imagen.convert("L")
+
+    plt.figure(figsize=(12, 7))
+
+    plt.subplot(2, 3, 1)
+    plt.imshow(imagen)
+    plt.title("Imagen original")
+    plt.axis("off")
+
+    plt.subplot(2, 3, 2)
+    plt.imshow(rojo, cmap="Reds", vmin=0, vmax=255)
+    plt.title("Canal rojo")
+    plt.axis("off")
+
+    plt.subplot(2, 3, 3)
+    plt.imshow(verde, cmap="Greens", vmin=0, vmax=255)
+    plt.title("Canal verde")
+    plt.axis("off")
+
+    plt.subplot(2, 3, 4)
+    plt.imshow(azul, cmap="Blues", vmin=0, vmax=255)
+    plt.title("Canal azul")
+    plt.axis("off")
+
+    plt.subplot(2, 3, 5)
+    plt.imshow(gris, cmap="gray", vmin=0, vmax=255)
+    plt.title("Escala de grises")
+    plt.axis("off")
+
+    plt.tight_layout()
+    plt.show()
+
+
+ruta = Path(__file__).parent / "imagenes" / "flores.jpg"
+
+imagen = Image.open(ruta).convert("RGB")
+
+separar_colores(imagen)

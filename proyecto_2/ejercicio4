@@ -1,0 +1,72 @@
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from pathlib import Path
+
+carpeta = Path(__file__).resolve().parent / "imagenes"
+
+def combinar_imagenes(ruta_fondo, ruta_plantilla):
+    fondo = cv2.imread(str(carpeta / ruta_fondo))
+    lena = cv2.imread(str(carpeta / "imagen12.png"))
+    plantilla = cv2.imread(
+        str(carpeta / ruta_plantilla),
+        cv2.IMREAD_GRAYSCALE
+    )
+
+    if fondo is None or lena is None or plantilla is None:
+        raise FileNotFoundError("Falta alguna imagen en la carpeta")
+
+    alto, ancho = fondo.shape[:2]
+
+    lena = cv2.resize(lena, (ancho, alto))
+    plantilla = cv2.resize(
+        plantilla, (ancho, alto),
+        interpolation=cv2.INTER_NEAREST
+    )
+
+    _, mascara = cv2.threshold(
+        plantilla, 127, 255, cv2.THRESH_BINARY
+    )
+
+    mascara_inversa = cv2.bitwise_not(mascara)
+
+    parte_fondo = cv2.bitwise_and(
+        fondo, fondo, mask=mascara_inversa
+    )
+
+    parte_lena = cv2.bitwise_and(
+        lena, lena, mask=mascara
+    )
+
+    resultado = cv2.add(parte_fondo, parte_lena)
+
+    return resultado
+
+
+fondos = [
+    "maceta.png",
+    "libro.png",
+    "plaza.png",
+    "monito.jpg"
+]
+
+plantillas = [
+    "filtro1.png",
+    "filtro2.png",
+    "filtro3.png",
+    "filtro4.png"
+]
+
+for i in range(4):
+    resultado = combinar_imagenes(fondos[i], plantillas[i])
+
+    cv2.imwrite(f"resultado{i+1}.png", resultado)
+
+    plt.subplot(1, 4, i+1)
+    plt.imshow(cv2.cvtColor(resultado, cv2.COLOR_BGR2RGB))
+    plt.title(f"Resultado {i+1}")
+    plt.axis("off")
+
+plt.tight_layout()
+plt.show()

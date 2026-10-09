@@ -3,7 +3,7 @@ import numpy as np
 
 
 # Cargar imagen
-imagen = cv2.imread("/imagenesdeproyecto1part1/vocales.png")
+imagen = cv2.imread("parte1/imagenesdeproyecto1part1/vocales.png")
 
 
 def detectar_imagen(imagen):

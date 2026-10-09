@@ -26,9 +26,9 @@ FIGURAS_CONFIG = [
 
 TAM_CUADRO = 113  # lado del cuadro negro en la plantilla (en pixeles)
 
-PLANTILLA_PATH = "plantilla.png"
-FIGURAS_PATH   = "figuras.png"
-OUTPUT_PATH    = "resultado_etapa2.png"
+PLANTILLA_PATH = "imagenproyecto/plantilla.png"
+FIGURAS_PATH   = "imagenproyecto/figuras.png"
+OUTPUT_PATH    = "imagenproyecto/resultado_etapa2.png"
 
 
 # FUNCIONES DE PROCESAMIENTO DE IMAGENES (PIL)
