@@ -1,8 +1,11 @@
 import cv2
 import matplotlib.pyplot as plt
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
 
 # Cargar imagen en escala de grises
-imagen = cv2.imread("proyecto_2/imagenes/darlecolor.png", cv2.IMREAD_GRAYSCALE)
+imagen = cv2.imread(str(BASE_DIR / "imagenes" / "darlecolor.png"), cv2.IMREAD_GRAYSCALE)
 
 if imagen is None:
     print("Error al cargar la imagen")
@@ -12,7 +15,7 @@ if imagen is None:
 imagen_color = cv2.applyColorMap(imagen, cv2.COLORMAP_OCEAN)
 
 # Guardar resultado
-cv2.imwrite("proyecto_2/imagenes/dalecolor.png", imagen_color)
+cv2.imwrite(str(BASE_DIR / "imagenes" / "dalecolor.png"), imagen_color)
 
 # Mostrar original y resultado
 plt.figure(figsize=(10, 4))

@@ -4,6 +4,10 @@ import numpy as np
 from PIL import Image
 import os
 import sys
+from pathlib import Path
+
+# Directorio base del script (parte1/)
+BASE_DIR = Path(__file__).resolve().parent
 
 # Configuracion de posiciones y rotaciones de cada figura
 # Se midieron los angulos visualmente sobre la plantilla y se probaron
@@ -26,9 +30,9 @@ FIGURAS_CONFIG = [
 
 TAM_CUADRO = 113  # lado del cuadro negro en la plantilla (en pixeles)
 
-PLANTILLA_PATH = "imagenproyecto/plantilla.png"
-FIGURAS_PATH   = "imagenproyecto/figuras.png"
-OUTPUT_PATH    = "imagenproyecto/resultado_etapa2.png"
+PLANTILLA_PATH = str(BASE_DIR / "imagenproyecto" / "plantilla.png")
+FIGURAS_PATH   = str(BASE_DIR / "imagenproyecto" / "figuras.png")
+OUTPUT_PATH    = str(BASE_DIR / "imagenproyecto" / "resultado_etapa2.png")
 
 
 # FUNCIONES DE PROCESAMIENTO DE IMAGENES (PIL)

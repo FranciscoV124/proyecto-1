@@ -2,8 +2,11 @@
 from PIL import Image
 import matplotlib.pyplot as plt
 import cv2
+from pathlib import Path
 
-imagen = cv2.imread("proyecto_2/imagenes/lolcito.png")
+BASE_DIR = Path(__file__).resolve().parent
+
+imagen = cv2.imread(str(BASE_DIR / "imagenes" / "lolcito.png"))
 
 
 def detectar_imagen(imagen):
@@ -68,7 +71,7 @@ def calcular_histograma_rgb(imagen):
 if detectar_imagen(imagen):
 
     imagen_pil = Image.open(
-        "proyecto_2/imagenes/lolcito.png"
+        str(BASE_DIR / "imagenes" / "lolcito.png")
     ).convert("RGB")
 
     calcular_histograma_rgb(imagen_pil)

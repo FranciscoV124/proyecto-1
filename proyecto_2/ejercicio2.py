@@ -1,8 +1,11 @@
 from PIL import Image
 import matplotlib.pyplot as plt
 import cv2
+from pathlib import Path
 
-imagen = cv2.imread("proyecto_2/imagenes/monito.jpg")
+BASE_DIR = Path(__file__).resolve().parent
+
+imagen = cv2.imread(str(BASE_DIR / "imagenes" / "monito.jpg"))
 
 
 def detectar_imagen(imagen):
@@ -30,6 +33,6 @@ def calcular_histograma(imagen):
     plt.show()
 
 
-imagen = Image.open("proyecto_2/imagenes/monito.jpg")
+imagen = Image.open(str(BASE_DIR / "imagenes" / "monito.jpg"))
 
 calcular_histograma(imagen)

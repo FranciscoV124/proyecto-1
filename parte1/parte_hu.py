@@ -1,9 +1,12 @@
 import cv2
 import numpy as np
+from pathlib import Path
 
+# Directorio base del script (parte1/)
+BASE_DIR = Path(__file__).resolve().parent
 
 # Cargar imagen
-imagen = cv2.imread("parte1/imagenproyecto/vocales.png")
+imagen = cv2.imread(str(BASE_DIR / "imagenproyecto" / "vocales.png"))
 
 
 def detectar_imagen(imagen):

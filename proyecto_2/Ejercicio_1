@@ -1,5 +1,8 @@
 import cv2
 import numpy as np
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
 
 
 class AnalizadorFiguras:
@@ -389,8 +392,111 @@ class AnalizadorFiguras:
 
     def figura_c(self):
 
-        print("\nFigura C todavia no implementada")
-        print("Aqui calcularemos H1, H2 y H3 de Hu")
+        if not self.detectar_imagen():
+            return
+
+        gris = cv2.cvtColor(
+            self.imagen,
+            cv2.COLOR_BGR2GRAY
+        )
+
+        _, binaria = cv2.threshold(
+            gris,
+            0,
+            255,
+            cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU
+        )
+
+        momentos = cv2.moments(
+            binaria,
+            binaryImage=True
+        )
+
+        hu = cv2.HuMoments(momentos)
+
+        def calcular_log_hu(valor):
+            if valor == 0:
+                return 0
+            return -np.sign(valor) * np.log10(abs(valor))
+
+        h1 = hu[0][0]
+        h2 = hu[1][0]
+        h3 = hu[2][0]
+
+        h1_log = calcular_log_hu(h1)
+        h2_log = calcular_log_hu(h2)
+        h3_log = calcular_log_hu(h3)
+
+        print("\n==========================")
+        print("       FIGURA 1.c")
+        print("==========================")
+
+        print(
+            "\nMomento de Hu H1:"
+        )
+
+        print(
+            "H1 =",
+            h1
+        )
+
+        print(
+            "\nlog(H1):"
+        )
+
+        print(
+            "log(H1) =",
+            h1_log
+        )
+
+        print(
+            "\nMomento de Hu H2:"
+        )
+
+        print(
+            "H2 =",
+            h2
+        )
+
+        print(
+            "\nlog(H2):"
+        )
+
+        print(
+            "log(H2) =",
+            h2_log
+        )
+
+        print(
+            "\nMomento de Hu H3:"
+        )
+
+        print(
+            "H3 =",
+            h3
+        )
+
+        print(
+            "\nlog(H3):"
+        )
+
+        print(
+            "log(H3) =",
+            h3_log
+        )
+
+        cv2.imshow(
+            "Figura C",
+            self.imagen
+        )
+
+        cv2.imshow(
+            "Mascara Binaria",
+            binaria
+        )
+
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
 
 
@@ -415,7 +521,7 @@ def main():
         if opcion == "1":
 
             analizador = AnalizadorFiguras(
-                "proyecto_2/imagenes/imagen1.jpg"
+                str(BASE_DIR / "imagenes" / "imagen1.jpg")
             )
 
             analizador.figura_a()
@@ -425,7 +531,7 @@ def main():
         elif opcion == "2":
 
             analizador = AnalizadorFiguras(
-                "proyecto_2/imagenes/imagen2.jpg"
+                str(BASE_DIR / "imagenes" / "imagen2.jpg")
             )
 
             analizador.figura_b()
@@ -434,7 +540,7 @@ def main():
         elif opcion == "3":
 
             analizador = AnalizadorFiguras(
-                "proyecto_2/imagenes/imagen3.jpg.png"
+                str(BASE_DIR / "imagenes" / "imagen3.jpg.png")
             )
 
             analizador.figura_c()

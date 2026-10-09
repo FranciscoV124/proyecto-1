@@ -1,9 +1,12 @@
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
 
 # Cargar imagen
-imagen = Image.open("proyecto_2/imagenes/rgb.png").convert("RGB")
+imagen = Image.open(str(BASE_DIR / "imagenes" / "rgb.png")).convert("RGB")
 
 # Separar canales
 R, G, B = imagen.split()
